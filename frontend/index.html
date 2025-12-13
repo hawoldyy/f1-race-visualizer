@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>F1 Data Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <img src="assets/f1_logo.png" alt="F1 Logo" class="f1-logo">
+                <span>Data Dashboard</span>
+            </div>
+            <button class="hamburger" id="hamburger-btn">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </button>
+            <div class="nav-menu">
+                 <button class="nav-btn active" data-section="overview">
+                     <i class="fas fa-chart-line"></i> Overview
+                 </button>
+                 <button class="nav-btn" data-section="drivers">
+                     <i class="fas fa-user"></i> Drivers
+                 </button>
+                 <button class="nav-btn" data-section="constructors">
+                     <i class="fas fa-users"></i> Constructors
+                 </button>
+                 <button class="nav-btn" data-section="circuits">
+                     <i class="fas fa-map-marked-alt"></i> Circuits
+                 </button>
+                 <button class="nav-btn" data-section="races">
+                     <i class="fas fa-trophy"></i> Races
+                 </button>
+                 <button class="nav-btn" data-section="visualizations">
+                     <i class="fas fa-chart-bar"></i> Visualizations
+                 </button>
+             </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <section id="overview" class="section active">
+            <div class="section-header">
+                <h1><i class="fas fa-chart-line"></i> F1 Overview</h1>
+                <p class="overview-subtitle">
+                    <span class="subtitle-text">Key statistics and insights from Formula 1 history</span>
+                    <span class="subtitle-decoration">
+                        <i class="fas fa-flag-checkered"></i>
+                        <span class="racing-stripe"></span>
+                        <i class="fas fa-trophy"></i>
+                    </span>
+                </p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number" id="total-races">0</div>
+                        <div class="stat-label">Total Races</div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-user-friends"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number" id="total-drivers">0</div>
+                        <div class="stat-label">Drivers</div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number" id="total-constructors">0</div>
+                        <div class="stat-label">Constructors</div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-map-marked-alt"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number" id="total-circuits">0</div>
+                        <div class="stat-label">Circuits</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="overview-charts">
+                <div class="chart-container">
+                    <h3>Races by Year</h3>
+                    <canvas id="racesByYearChart"></canvas>
+                </div>
+
+                <div class="chart-container">
+                    <h3>Most Successful Drivers</h3>
+                    <canvas id="topDriversChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <section id="drivers" class="section">
+            <div class="section-header">
+                <h1><i class="fas fa-user"></i> Drivers Championship</h1>
+                <div class="filters">
+                    <select id="driver-year-select">
+                        <option value="">All Years</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="drivers-grid">
+                <div class="podium">
+                    <div class="podium-position second">
+                        <div class="trophy-icon silver"><i class="fas fa-trophy"></i></div>
+                        <div class="position-number">2</div>
+                        <div class="driver-info" id="second-place">
+                            <div class="driver-name">-</div>
+                            <div class="driver-points">-</div>
+                        </div>
+                    </div>
+                    <div class="podium-position first">
+                        <div class="trophy-icon gold"><i class="fas fa-trophy"></i></div>
+                        <div class="position-number">1</div>
+                        <div class="driver-info" id="first-place">
+                            <div class="driver-name">-</div>
+                            <div class="driver-points">-</div>
+                        </div>
+                    </div>
+                    <div class="podium-position third">
+                        <div class="trophy-icon bronze"><i class="fas fa-trophy"></i></div>
+                        <div class="position-number">3</div>
+                        <div class="driver-info" id="third-place">
+                            <div class="driver-name">-</div>
+                            <div class="driver-points">-</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="drivers-table-container">
+                    <table class="drivers-table" id="drivers-table">
+                        <thead>
+                            <tr>
+                                <th>Position</th>
+                                <th>Driver</th>
+                                <th>Constructor</th>
+                                <th>Points</th>
+                                <th>Wins</th>
+                                <th>Podiums</th>
+                            </tr>
+                        </thead>
+                        <tbody id="drivers-table-body">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="constructors" class="section">
+            <div class="section-header">
+                <h1><i class="fas fa-users"></i> Constructors Championship</h1>
+                <div class="filters">
+                    <select id="constructor-year-select">
+                        <option value="">All Years</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="constructors-grid">
+                <div class="podium">
+                    <div class="podium-position second">
+                        <div class="trophy-icon silver"><i class="fas fa-trophy"></i></div>
+                        <div class="position-number">2</div>
+                        <div class="constructor-info" id="second-constructor">
+                            <div class="constructor-name">-</div>
+                            <div class="constructor-points">-</div>
+                        </div>
+                    </div>
+                    <div class="podium-position first">
+                        <div class="trophy-icon gold"><i class="fas fa-trophy"></i></div>
+                        <div class="position-number">1</div>
+                        <div class="constructor-info" id="first-constructor">
+                            <div class="constructor-name">-</div>
+                            <div class="constructor-points">-</div>
+                        </div>
+                    </div>
+                    <div class="podium-position third">
+                        <div class="trophy-icon bronze"><i class="fas fa-trophy"></i></div>
+                        <div class="position-number">3</div>
+                        <div class="constructor-info" id="third-constructor">
+                            <div class="constructor-name">-</div>
+                            <div class="constructor-points">-</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="constructors-table-container">
+                    <table class="constructors-table" id="constructors-table">
+                        <thead>
+                            <tr>
+                                <th>Position</th>
+                                <th>Constructor</th>
+                                <th>Nationality</th>
+                                <th>Points</th>
+                                <th>Wins</th>
+                                <th>Podiums</th>
+                            </tr>
+                        </thead>
+                        <tbody id="constructors-table-body">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="circuits" class="section">
+            <div class="section-header">
+                <h1><i class="fas fa-map-marked-alt"></i> Circuits</h1>
+                <p class="circuits-subtitle">
+                    <span class="subtitle-text">Explore the tracks that host Formula 1 races</span>
+                    <span class="subtitle-decoration">
+                        <i class="fas fa-route"></i>
+                        <span class="track-stripe"></span>
+                        <i class="fas fa-map-marker-alt"></i>
+                    </span>
+                </p>
+            </div>
+
+            <div class="circuits-grid" id="circuits-grid">
+            </div>
+        </section>
+
+        <section id="races" class="section">
+            <div class="section-header">
+                <h1><i class="fas fa-trophy"></i> Race Results</h1>
+                <div class="filters">
+                    <select id="race-year-select">
+                        <option value="">Select Year</option>
+                    </select>
+                    <select id="race-circuit-select">
+                        <option value="">Select Circuit</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="race-results" id="race-results">
+            </div>
+        </section>
+
+        <section id="visualizations" class="section">
+            <div class="section-header">
+                <h1><i class="fas fa-chart-bar"></i> Data Visualizations</h1>
+                <p class="visualizations-subtitle">
+                    <span class="subtitle-text">Interactive charts revealing deep insights into Formula 1 data</span>
+                    <span class="subtitle-decoration">
+                        <i class="fas fa-chart-bar"></i>
+                        <span class="data-stripe"></span>
+                        <i class="fas fa-search"></i>
+                    </span>
+                </p>
+            </div>
+
+            <div class="visualization-controls">
+                <div class="control-group">
+                    <label for="viz-type">Visualization Type:</label>
+                    <select id="viz-type">
+                        <option value="lap-times">Pit Stop Performance</option>
+                        <option value="points-progression">Driver Championship Points</option>
+                        <option value="constructor-performance">Constructor Standings</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label for="viz-year">Year:</label>
+                    <select id="viz-year">
+                        <option value="">Select Year</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label for="viz-driver">Driver:</label>
+                    <select id="viz-driver">
+                        <option value="">Select Driver</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="visualization-container">
+                <canvas id="main-visualization-chart"></canvas>
+            </div>
+        </section>
+    </main>
+
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="loading-spinner">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Loading F1 Data...</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
