@@ -1,3 +1,4 @@
+const API_BASE = "https://f1-race-visualizer.onrender.com";
 let allData = {
     races: null,
     drivers: null,
@@ -60,40 +61,52 @@ async function loadAllData() {
     showLoading(true);
 
     try {
-        const csvFiles = [
-            { key: 'circuits', path: '../backend/data/circuits.csv' },
-            { key: 'races', path: '../backend/data/races.csv' },
-            { key: 'drivers', path: '../backend/data/drivers.csv' },
-            { key: 'results', path: '../backend/data/results.csv' },
-            { key: 'driverStandings', path: '../backend/data/driver_standings.csv' },
-            { key: 'constructorStandings', path: '../backend/data/constructor_standings.csv' },
-            { key: 'constructors', path: '../backend/data/constructors.csv' },
-            { key: 'seasons', path: '../backend/data/seasons.csv' },
-            { key: 'qualifying', path: '../backend/data/qualifying.csv' },
-            { key: 'pitStops', path: '../backend/data/pit_stops.csv' },
-            { key: 'sprintResults', path: '../backend/data/sprint_results.csv' },
-            { key: 'status', path: '../backend/data/status.csv' }
+        const endpoints = [
+            { key: 'circuits', url: `${API_BASE}/data/circuits` },
+            { key: 'races', url: `${API_BASE}/data/races` },
+            { key: 'drivers', url: `${API_BASE}/data/drivers` },
+            { key: 'results', url: `${API_BASE}/data/results` },
+            { key: 'driverStandings', url: `${API_BASE}/data/driver-standings` },
+            { key: 'constructorStandings', url: `${API_BASE}/data/constructor-standings` },
+            { key: 'constructors', url: `${API_BASE}/data/constructors` },
+            { key: 'seasons', url: `${API_BASE}/data/seasons` },
+            { key: 'qualifying', url: `${API_BASE}/data/qualifying` },
+            { key: 'pitStops', url: `${API_BASE}/data/pit-stops` },
+            { key: 'sprintResults', url: `${API_BASE}/data/sprint-results` },
+            { key: 'status', url: `${API_BASE}/data/status` }
         ];
 
-        const responses = await Promise.all(csvFiles.map(file => fetch(file.path)));
-        const texts = await Promise.all(responses.map(res => res.text()));
+        const responses = await Promise.all(
+            endpoints.map(e => fetch(e.url))
+        );
 
-        csvFiles.forEach((file, index) => {
-            allData[file.key] = Papa.parse(texts[index], { header: true, skipEmptyLines: true }).data;
+        responses.forEach(res => {
+            if (!res.ok) {
+                throw new Error(`Failed to fetch ${res.url}`);
+            }
+        });
+
+        const jsonData = await Promise.all(
+            responses.map(res => res.json())
+        );
+
+        endpoints.forEach((endpoint, index) => {
+            allData[endpoint.key] = jsonData[index];
         });
 
         dataLoaded = true;
-        console.log('All F1 data loaded successfully');
+        console.log("✅ All F1 data loaded from Render backend");
 
         loadOverviewData();
 
     } catch (error) {
-        console.error('Error loading data:', error);
-        showStatusMessage('Failed to load F1 data', 'error');
+        console.error("❌ Error loading data:", error);
+        showStatusMessage("Failed to load F1 data from backend", "error");
     } finally {
         showLoading(false);
     }
 }
+
 
 function loadSectionData(sectionId) {
     switch (sectionId) {
